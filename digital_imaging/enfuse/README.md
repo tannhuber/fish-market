@@ -1,7 +1,7 @@
 # enfuse.fish
 
-Converts raw images with different exposures using ufraw-batch and combines
-them with enfuse. Resulting image is in tiff format.
+Converts raw images with different exposures using `ufraw-batch` and combines
+them with `enfuse`. Resulting image is in tiff format.
 
 ## How to use
 
