@@ -3,6 +3,11 @@
 Converts raw images with different exposures using `ufraw-batch` and combines
 them with `enfuse`. Resulting image is in tiff format.
 
+## Requirements
+
+* enfuse
+* ufraw
+
 ## How to use
 
 ```
