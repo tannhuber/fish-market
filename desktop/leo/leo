@@ -1,0 +1,2 @@
+#!/usr/local/bin/fish
+open 'http://pda.leo.org?search='(echo $argv | sed -e 's|\ |\+|g')
