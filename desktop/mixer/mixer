@@ -1,0 +1,16 @@
+#!/usr/local/bin/fish
+
+switch $argv[1]
+case '+'
+	amixer -c 0 sset Master 1+
+	amixer -c 0 sset Headphone 1+
+	amixer -c 0 sset PCM 1+
+case '-' ]
+	amixer -c 0 sset Master 1-
+	amixer -c 0 sset Headphone 1-
+	amixer -c 0 sset PCM 1-
+case 'm' ]
+	amixer -c 0 sset Master toggle
+	amixer -c 0 sset Headphone toggle
+	amixer -c 0 sset PCM toggle
+end

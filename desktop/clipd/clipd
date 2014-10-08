@@ -1,15 +1,15 @@
 #!/usr/local/bin/fish
 
 if begin; test (count $argv) -gt 0; and test $argv[1] = "menu"; end
-	echo -sn $CLIPBOARD\n | dmenu.xft -l 45 -nb "#000000" -nf "#0075FF" -sb "#00FF75" -sf "#000000"  -fn "DejaVu Sans Mono for Powerline:Bold:size=12" -p "clip" | tr -d '\n' | sed 's|↵|\n|g' | xsel -i
+    echo -sn $CLIPBOARD\n | dmenu.xft -l 45 -nb "#000000" -nf "#0075FF" -sb "#00FF75" -sf "#000000"  -fn "DejaVu Sans Mono for Powerline:Bold:size=12" -p "clip" | tr -d '\n' | sed 's|↵|\n|g' | xsel -i
 else
     set -U CLIPBOARD
-	while true
-		set -l RECENT (xsel -o | sed ':a;N;$!ba;s|\n|↵|g')
-		if begin; test (count $RECENT) -gt 0; and contains $RECENT $CLIPBOARD; end
+    while true
+        set -l RECENT (xsel -o | sed ':a;N;$!ba;s|\n|↵|g')
+        if begin; test (count $RECENT) -gt 0; and contains $RECENT $CLIPBOARD; end
             set -e CLIPBOARD[(contains -i $RECENT $CLIPBOARD)]
-        end
-        set CLIPBOARD $RECENT $CLIPBOARD
-		sleep 1
-	end
+    end
+    set CLIPBOARD $RECENT $CLIPBOARD
+    sleep 1
+end
 end
