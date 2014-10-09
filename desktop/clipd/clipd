@@ -1,7 +1,7 @@
 #!/usr/local/bin/fish
 
 if begin; test (count $argv) -gt 0; and test $argv[1] = "menu"; end
-    echo -sn $CLIPBOARD\n | dmenu.xft -l 45 -nb "#000000" -nf "#0075FF" -sb "#00FF75" -sf "#000000"  -fn "DejaVu Sans Mono for Powerline:Bold:size=12" -p "clip" | tr -d '\n' | sed 's|↵|\n|g' | xsel -i
+    echo -sn $CLIPBOARD\n | dmenu -l 45 -nb "#000000" -nf "#0075FF" -sb "#00FF75" -sf "#000000"  -fn "DejaVu Sans Mono for Powerline:Bold:size=12" -p "clip" | tr -d '\n' | sed 's|↵|\n|g' | xsel -i
 else
     set -U CLIPBOARD
     while true

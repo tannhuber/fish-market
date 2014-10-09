@@ -10,9 +10,11 @@ If you want to share a fish script, send a pull request. There are almost no
 restrictions. You should provide a `README` file which explains the functions in
 the script with all available parameters. In case anybody needs help, it would
 be nice to have some contact information of the author as well. Put a few
-important keywords in the `taglist.md` file. 
+important keywords into [taglist.md][taglist]. 
 
 # Tag list
 
-The `taglist.md` file can be checked for keywords with your favorite
+The [taglist][taglist] can be checked for keywords with your favorite
 pager/editor in order to find interesting scripts.
+
+[taglist]: https://github.com/tannhuber/fish-market/blob/master/taglist.md
