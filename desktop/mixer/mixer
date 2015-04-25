@@ -1,16 +1,26 @@
 #!/usr/local/bin/fish
 
+set state (amixer -c1 get Master | grep off > /dev/null; and echo off; or echo on)
+if [ $state = 'off' ]
+    set newstate on
+else
+    set newstate off
+end
+
 switch $argv[1]
 case '+'
-	amixer -c 0 sset Master 1+
-	amixer -c 0 sset Headphone 1+
-	amixer -c 0 sset PCM 1+
+	amixer -c 1 sset Master 2dB+
+	amixer -c 1 sset Headphone 2dB+ $state
+	amixer -c 1 sset Speaker 2dB+ $state
+	amixer -c 1 sset PCM 2dB+
 case '-' ]
-	amixer -c 0 sset Master 1-
-	amixer -c 0 sset Headphone 1-
-	amixer -c 0 sset PCM 1-
+	amixer -c 1 sset Master 2dB-
+	amixer -c 1 sset Headphone 2dB- $state
+	amixer -c 1 sset Speaker 2dB- $state
+	amixer -c 1 sset PCM 2dB-
 case 'm' ]
-	amixer -c 0 sset Master toggle
-	amixer -c 0 sset Headphone toggle
-	amixer -c 0 sset PCM toggle
+	amixer -c 1 sset Master $newstate
+	amixer -c 1 sset Headphone $newstate
+	amixer -c 1 sset Speaker $newstate
+	amixer -c 1 sset PCM
 end

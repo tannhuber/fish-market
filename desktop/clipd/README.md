@@ -4,7 +4,8 @@ clipboard manager
 
 ## Requirements
 
-* dmenu
+* dmenu (with xft patch; on a debian based system you can run
+  `update-alternatives --config dmenu`)
 * xsel
 
 ## How to use
