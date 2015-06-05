@@ -2,10 +2,11 @@
 
 if begin; test (count $argv) -gt 0; and test $argv[1] = "menu"; end
     echo -sn $CLIPBOARD\n | dmenu -l 45 -nb "#000000" -nf "#0075FF" -sb "#00FF75" -sf "#000000"  -fn "DejaVuSansMono:Bold" -p "clip" | tr -d '\n' | sed 's|↵|\n|g' | xsel -b -i
-else
+elseo
     set -U CLIPBOARD
     while true
         set -l RECENT (xsel -o | sed ':a;N;$!ba;s|\n|↵|g')
+        #        echo $RECENT | sed 's|↵|\n|g' | xsel -b -i
         if begin; test (count $RECENT) -gt 0; and contains -- $RECENT $CLIPBOARD; end
             set -e CLIPBOARD[(contains -i -- $RECENT $CLIPBOARD)]
     end
