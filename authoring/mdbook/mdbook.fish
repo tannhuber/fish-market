@@ -277,7 +277,7 @@ set depth 0
 set order 1
 set chapter 1
 for sectionnum in (seq $numsections)
-    if test $contentfiles[$sectionnum] -eq 0
+    if expr $contentfiles[$sectionnum] : "0" > /dev/null
         continue
     end
     while test $depth -lt $sectiondepths[$sectionnum]
