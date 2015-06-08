@@ -1,10 +1,10 @@
 #!/usr/local/bin/fish
 ################################################################################
 # File:
-#   md2epub.fish
+#   mdbook.fish
 #
 # Description:
-#   Creates ebooks in epub format from markdown input files
+#   Creates ebooks in epub and mobi format from markdown input files
 #
 # Maintainer:
 #   Joseph Tannhuber <sepp.tannhuber@yahoo.de>
@@ -15,8 +15,9 @@
 ################################################################################
 set date (date +%F)
 if not test -e ".metadata"
+    echo '# Created by mdbook.fish' > .metadata
     read -p 'echo "title: "' title
-    echo -e "title\t$title" > .metadata
+    echo -e "title\t$title" >> .metadata
     read -p 'echo "author: "' author
     echo -e "author\t$author" >> .metadata
     read -p 'echo "publisher: "' publisher
@@ -51,29 +52,25 @@ end
 ################################################################################
 # => Calculate toc depth
 ################################################################################
-set tmpfile1 (mktemp)
-set tmpfile2 (mktemp)
-grep --color=never '^#[^#]' (seq 0 9)*.md > /dev/null; and set uppertocdepth 1
-grep --color=never '^##[^#]' (seq 0 9)*.md > /dev/null; and set uppertocdepth 2
-grep --color=never '^###[^#]' (seq 0 9)*.md > /dev/null; and set uppertocdepth 3
-grep --color=never '^####[^#]' (seq 0 9)*.md > /dev/null; and set uppertocdepth 4
-grep --color=never '^####[^#]' (seq 0 9)*.md > /dev/null; and set lowertocdepth 4
-grep --color=never '^###[^#]' (seq 0 9)*.md > /dev/null; and set lowertocdepth 3
-grep --color=never '^##[^#]' (seq 0 9)*.md > /dev/null; and set lowertocdepth 2
-grep --color=never '^#[^#]' (seq 0 9)*.md > /dev/null; and set lowertocdepth 1
+set tmpfile (mktemp)
+grep --color=never '^#[^#]' (seq 0 9)*.md > /dev/null; and set tocdepth 1
+grep --color=never '^##[^#]' (seq 0 9)*.md > /dev/null; and set tocdepth 2
+grep --color=never '^###[^#]' (seq 0 9)*.md > /dev/null; and set tocdepth 3
+grep --color=never '^####[^#]' (seq 0 9)*.md > /dev/null; and set tocdepth 4
 for file in (seq 0 9)*.md
     grep -H --color=never '^#' $file \
-    | sed -e 's|\.md:|\\t|' -e 's|####|4\\t|' -e 's|###|3\\t|' -e 's|##|2\\t|' -e 's|#|1\\t|' >> $tmpfile2
+    | sed -e 's|\.md:|\\t|' -e 's|####|4\\t|' -e 's|###|3\\t|' -e 's|##|2\\t|' -e 's|#|1\\t|' >> $tmpfile
 end
-set contentfiles (cut -f1 $tmpfile2)
-set sectiondepths (cut -f2 $tmpfile2)
-set sections (cut -f3 $tmpfile2 | sed 's|^[[:space:]]*||')
+set contentfiles (cut -f1 $tmpfile)
+set sectiondepths (cut -f2 $tmpfile)
+set sections (cut -f3 $tmpfile | sed 's|^[[:space:]]*||')
 set references (seq (count $sections))
-rm $tmpfile2
+rm $tmpfile
 
 ################################################################################
 # => Create directory tree
 ################################################################################
+test -d "build/OEBPS/content/"; and rm -rf "build/OEBPS/content/"
 for directory in META-INF OEBPS/content OEBPS/images OEBPS/css OEBPS/fonts
     test -d "build/$directory"
     or mkdir -p "build/$directory"
@@ -109,14 +106,19 @@ for mdfile in (seq 0 9)*.md
     | sed -e 's|^<h\([1234]\)\(.*\)|<h\1\2</h\1>|' \
     -e 's|\~\~\([^~]*\)\~\~|<span class="st">\1</span>|g' \
     -e 's|\~\([^~]*\)\~|<span class="u">\1</span>|g' \
-    -e 's|\*\*\([^*]*\)\*\*|<span class="b">\1</span>|g' \
-    -e 's|\*\([^*]*\)\*|<span class="i">\1</span>|g' \
-    -e 's|__\([^_]*\)__|<span class="b">\1</span>|g' \
-    -e 's|_\([^_]*\)_|<span class="i">\1</span>|g' >> $htmlfile
+    -e 's|[*_][*_]\([^*_]*\)[*_][*_]|<span class="b">\1</span>|g' \
+    -e 's|[*_]\([^*_]*\)[*_]|<span class="i">\1</span>|g' >> $htmlfile
     echo '</body>
     </html>' >> $htmlfile
     sed -i 's|^[[:space:]]*||' $htmlfile
 end
+
+#    -e 's|\([*_][*_][^*_]*\)[*_]\([^*_]*\)[*_]\([^*_]*[*_][*_]\)|\1<span class="ib">\2</span>\3|g' \
+#    -e 's|\([*_][^*_]*\)[*_][*_]\([^*_]*\)[*_][*_]\([^*_]*[*_]\)|\1<span class="ib">\2</span>\3|g' \
+#    -e 's|\([*_][*_][^*_]*\)[~]\([^*_]*\)[~]\([^*_]*[*_][*_]\)|\1<span class="bu">\2</span>\3|g' \
+#    -e 's|\([~][^*_]*\)[*_][*_]\([^*_]*\)[*_][*_]\([^*_]*[~]\)|\1<span class="bu">\2</span>\3|g' \
+#    -e 's|\([*_][^*_]*\)[~]\([^*_]*\)[~]\([^*_]*[*_]\)|\1<span class="iu">\2</span>\3|g' \
+#    -e 's|\([~][^*_]*\)[*_]\([^*_]*\)[*_]\([^*_]*[~]\)|\1<span class="iu">\2</span>\3|g' \
 
 ################################################################################
 # => Create mimetype file
@@ -163,8 +165,9 @@ for content in build/OEBPS/content/(seq 0 9)*
     echo '<item href="content/'(basename $content)'" id="htmlcontent'(basename $content | cut -d'.' -f1)'" media-type="application/xhtml+xml"/>' >> $contentfile
 end
 echo '<item href="css/stylesheet.css" id="cssstylesheet" media-type="text/css"/>' >> $contentfile
-for font in build/OEBPS/fonts/*
-    echo '<item href="fonts/'(basename $font)'" id="font1" media-type="font/opentype"/>' >> $contentfile
+for font in build/OEBPS/fonts/*.otf
+    set fontname (echo $font | cut -d'.' -f1)
+    echo '<item href="fonts/'(basename $font)'" id="'$fontname'" media-type="font/opentype"/>' >> $contentfile
 end
 echo '</manifest>' >> $contentfile
 # Write spine section
@@ -201,7 +204,7 @@ echo '<?xml version="1.0" encoding="utf-8"?>
 # Write metadata Section
 echo '<head>
 <meta content="urn:uuid:'$uuid'" name="dtb:uid"/>
-<meta content="'$uppertocdepth'" name="dtb:depth"/>
+<meta content="'$tocdepth'" name="dtb:depth"/>
 <meta content="0" name="dtb:totalPageCount"/>
 <meta content="0" name="dtb:maxPageNumber"/>
 </head>' >> $tocfile
@@ -220,21 +223,8 @@ set order 1
 set chapter 1
 for sectionnum in (seq $numsections)
     if test $sectionnum -gt 1
-        switch $sectiondepths[$sectionnum]
-            case 1
-                set chapter (expr $chapter + 1)
-                set section 0
-                set subsection 0
-                set subsubsection 0
-            case 2
-                set section (expr $section + 1)
-                set subsection 0
-                set subsubsection 0
-            case 3
-                set subsection (expr $subsection + 1)
-                set subsubsection 0
-            case 4
-                set subsubsection (expr $subsubsection + 1)
+        if test $sectiondepths[$sectionnum] -eq 1
+            set chapter (expr $chapter + 1)
         end
     end
     while test $depth -lt $sectiondepths[$sectionnum]
@@ -287,6 +277,9 @@ set depth 0
 set order 1
 set chapter 1
 for sectionnum in (seq $numsections)
+    if test $contentfiles[$sectionnum] -eq 0
+        continue
+    end
     while test $depth -lt $sectiondepths[$sectionnum]
         set depth (expr $depth + 1)
         if test $depth -lt $sectiondepths[$sectionnum]
@@ -331,6 +324,7 @@ if not test -e $stylesheet
     text-indent: 0;
     text-align: center;
     margin: 100px 0 0 0;
+    font-family: sans-serif;
     font-size: 2.0em;
     font-weight: bold;
     page-break-before: always;
@@ -340,6 +334,7 @@ if not test -e $stylesheet
     text-indent: 0;
     text-align: center;
     margin: 50px 0 0 0;
+    font-family: sans-serif;
     font-size: 1.5em;
     font-weight: bold;
     page-break-before: always;
@@ -348,6 +343,7 @@ if not test -e $stylesheet
     {
     text-indent: 0;
     text-align: left;
+    font-family: sans-serif;
     font-size: 1.4em;
     font-weight: bold;
     }
@@ -355,21 +351,8 @@ if not test -e $stylesheet
     {
     text-indent: 0;
     text-align: left;
+    font-family: sans-serif;
     font-size: 1.2em;
-    font-weight: bold;
-    }
-    h5
-    {
-    text-indent: 0;
-    text-align: left;
-    font-size: 1.1em;
-    font-weight: bold;
-    }
-    h6
-    {
-    text-indent: 0;
-    text-align: left;
-    font-size: 1.0em;
     font-weight: bold;
     }
     /*===Paragraph Elements===*/

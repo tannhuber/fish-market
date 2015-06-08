@@ -1,3 +1,8 @@
+# [authoring][authoring]
+
+## [mdbook][mdbook]
+ebook epub mobi kindle
+
 # [digital_imaging][digital_imaging]
 
 ## [enfuse][enfuse]
@@ -14,6 +19,8 @@ mixer alsa amixer volume audio sound
 ## [leo][leo]
 leo translator dictionary
 
+[authoring]: https://github.com/tannhuber/fish-market/tree/master/authoring
+[mdbook]: https://github.com/tannhuber/fish-market/tree/master/authoring/mdbook
 [digital_imaging]: https://github.com/tannhuber/fish-market/tree/master/digital_imaging
 [enfuse]: https://github.com/tannhuber/fish-market/tree/master/digital_imaging/enfuse
 
