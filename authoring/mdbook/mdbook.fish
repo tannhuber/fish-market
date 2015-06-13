@@ -48,6 +48,13 @@ else
     set copyrights (grep --color=never '^copyrights' .metadata | cut -f2)
     set uuid (grep --color=never '^uuid' .metadata | cut -f2)
 end
+switch $language
+    case 'de'
+        set toctitle "Inhaltsverzeichnis"
+    case 'en'
+        set toctitle "Contents"
+end
+
 
 ################################################################################
 # => Calculate toc depth
@@ -103,11 +110,13 @@ for mdfile in (seq 0 9)*.md
         sub(/^###[[:space:]]*/,"<h3 id=\"ref"id"\">") \
         sub(/^##[[:space:]]*/,"<h2 id=\"ref"id"\">") \
         sub(/^#[[:space:]]*/,"<h1 id=\"ref"id"\">") id++}1' \
-    | sed -e 's|^<h\([1234]\)\(.*\)|<h\1\2</h\1>|' \
-    -e 's|\~\~\([^~]*\)\~\~|<span class="st">\1</span>|g' \
-    -e 's|\~\([^~]*\)\~|<span class="u">\1</span>|g' \
-    -e 's|[*_][*_]\([^*_]*\)[*_][*_]|<span class="b">\1</span>|g' \
-    -e 's|[*_]\([^*_]*\)[*_]|<span class="i">\1</span>|g' >> $htmlfile
+    | sed -re 's|^<h([1234])(.*)|<h\1\2</h\1>|' \
+    -e 's|»|<span class="i">»|g' \
+    -e 's|«|«</span>|g' \
+    -e 's|\~\~([^~]*)\~\~|<span class="st">\1</span>|g' \
+    -e 's|\~([^~]*)\~|<span class="u">\1</span>|g' \
+    -e 's|[*_][*_]([^*_]*)[*_][*_]|<span class="b">\1</span>|g' \
+    -e 's|[*_]([^*_]*)[*_]|<span class="i">\1</span>|g' >> $htmlfile
     echo '</body>
     </html>' >> $htmlfile
     sed -i 's|^[[:space:]]*||' $htmlfile
@@ -189,7 +198,7 @@ for file in $contentfiles
     end
 end
 echo '<guide>
-<reference href="content/htmltoc.html" type="toc" title="Inhaltsverzeichnis"/>
+<reference href="content/htmltoc.html" type="toc" title="'$toctitle'"/>
 <reference href="content/'$beginning'.html" type="text" title="Anfang" />
 </guide>
 </package>' >> $contentfile
@@ -272,7 +281,7 @@ echo '<?xml version="1.0" encoding="UTF-8"?>
 <title>'$title'</title>
 </head>
 <body>
-<h2>Inhaltsverzeichnis</h2>' > $htmltocfile
+<h2>'$toctitle'</h2>' > $htmltocfile
 set depth 0
 set order 1
 set chapter 1
