@@ -51,8 +51,10 @@ end
 switch $language
     case 'de'
         set toctitle "Inhaltsverzeichnis"
+        set refstart "Anfang"
     case 'en'
         set toctitle "Contents"
+        set refstart "Begining"
 end
 
 
@@ -199,7 +201,7 @@ for file in $contentfiles
 end
 echo '<guide>
 <reference href="content/htmltoc.html" type="toc" title="'$toctitle'"/>
-<reference href="content/'$beginning'.html" type="text" title="Anfang" />
+<reference href="content/'$beginning'.html" type="text" title="'$refstart'"/>
 </guide>
 </package>' >> $contentfile
 
